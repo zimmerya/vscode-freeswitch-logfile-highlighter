@@ -3,6 +3,26 @@
 import * as vscode from 'vscode';
 import CustomPattern = require('./CustomPattern');
 
+class Pattern {
+    pattern: string;
+    foreground?: string;
+    background?: string;
+    fontWeight?: string;
+    fontStyle?: string;
+    border?: string;
+    borderRadius?: string;
+    borderSpacing?: string;
+    letterSpacing?: string;
+    overviewColor?: string;
+    overviewRulerLane?: string;
+    textDecoration?: string;
+
+    public constructor(pattern: string, foreground: string) {
+        this.pattern = pattern;
+        this.foreground = foreground;
+    }
+}
+
 class CustomPatternDecorator {
 
     // All custom log level specified in the configuration.
@@ -17,21 +37,28 @@ class CustomPatternDecorator {
     }
 
     public updateConfiguration(): void {
-        const configPatterns = vscode.workspace.getConfiguration('logFileHighlighter').get(
-            'customPatterns') as {
-                pattern: string,
-                foreground?: string,
-                background?: string,
-                fontWeight?: string,
-                fontStyle?: string,
-                border?: string,
-                borderRadius?: string,
-                borderSpacing?: string,
-                letterSpacing?: string,
-                overviewColor?: string,
-                overviewRulerLane?: string,
-                textDecoration?: string,
-            }[];
+        const configPatterns = []; //vscode.workspace.getConfiguration('logFileHighlighter').get('customPatterns') as Pattern[];
+
+        //configPatterns.push([pattern: 'sofia\/external', foreground: '#FF0000', null, null, null, null, null, null, null, null, null, null] as Pattern);
+
+        // gateways
+        configPatterns.push(new Pattern('sofia\\/[a-zA-Z]+\\/((\\+)?[0-9]+(@[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+(:[0-9]+)?)?)?', '#AFFFAF'));
+        // log levels
+        configPatterns.push(new Pattern('\\[DEBUG\\]', '#FFFF00'));
+        configPatterns.push(new Pattern('\\[INFO\\]', '#00FF00'));
+        configPatterns.push(new Pattern('\\[NOTICE\\]', '#00FFFF'));
+        configPatterns.push(new Pattern('\\[WARNING\\]', '#808000'));
+        configPatterns.push(new Pattern('\\[ERROR|CRITICAL\\]', '#FF0000'));
+        // guuid
+        configPatterns.push(new Pattern('[\\da-f]{8}-[\\da-f]{4}-[\\da-f]{4}-[\\da-f]{4}-[\\da-f]{12}', '#949494'));
+        // percent load
+        configPatterns.push(new Pattern('[0-9]+\\.[0-9]+%', '#E0E0E0'));
+        // time
+        configPatterns.push(new Pattern('[0-9]{4}-[0-9]{2}-[0-9]{2}\\s[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]+', '#5fd7af'));
+        // (phone) numbers
+        configPatterns.push(new Pattern('(\\+)?[0-9]{6,}', '#6789ab'));
+        // c(pp) files
+        configPatterns.push(new Pattern('[a-z_]+\\.c(pp)?:[0-9]+', '#d7afd7'));
 
         for (const pattern of this._configPattern) {
             pattern.dispose();
